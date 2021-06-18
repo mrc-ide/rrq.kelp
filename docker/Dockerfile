@@ -12,6 +12,11 @@ COPY docker/Rprofile.site /usr/local/lib/R/etc/Rprofile.site
 
 COPY DESCRIPTION /tmp/DESCRIPTION
 
+COPY docker/bin /usr/local/bin/
+
+RUN install_remote \
+        mrc-ide/kelp
+
 RUN install2.r --error remotes &&  \
         Rscript -e 'remotes::install_deps("/tmp")'
 
