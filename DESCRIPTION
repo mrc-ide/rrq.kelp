@@ -15,4 +15,11 @@ RoxygenNote: 7.1.1
 URL: https://github.com/mrc-ide/rrq.kelp
 BugReports: https://github.com/mrc-ide/rrq.kelp/issues
 Suggests:
-    testthat
+    ids,
+    testthat,
+    withr
+Imports:
+    kelp,
+    R6,
+    redux,
+    rrq

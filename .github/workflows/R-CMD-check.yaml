@@ -70,6 +70,28 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
+      - name: Start SeaweedFS
+        if: runner.os == 'Linux'
+        run: ./scripts/seaweed start
+
+      - name: Start Redis
+        if: runner.os != 'Windows'
+        uses: shogo82148/actions-setup-redis@v1
+        with:
+          redis-version: "4.x"
+
+      - name: Create free space
+        if: runner.os == 'Linux'
+        run: |
+          # Workaround to provide additional free space for testing.
+          # We need this because otherwise SeaweedFS runs out of space
+          # and builds run until they time out
+          # https://github.com/actions/virtual-environments/issues/2840
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
