@@ -1,0 +1,18 @@
+Package: rrq.kelp
+Title: SeaweedFS backed file store for rrq
+Version: 0.1.0
+Authors@R: c(person("Rob", "Ashton", role = c("aut", "cre"),
+                    email = "r.ashton@imperial.ac.uk"),
+             person("Imperial College of Science, Technology and Medicine",
+                    role = "cph"))
+Description: A offload file store for rrq. Using kelp API to interact with
+    SeaweedFS, this can be used to save large input or output data to a 
+    distributed file store.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+URL: https://github.com/mrc-ide/rrq.kelp
+BugReports: https://github.com/mrc-ide/rrq.kelp/issues
+Suggests:
+    testthat
