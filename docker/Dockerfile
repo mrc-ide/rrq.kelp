@@ -15,7 +15,7 @@ COPY DESCRIPTION /tmp/DESCRIPTION
 COPY docker/bin /usr/local/bin/
 
 RUN install_remote \
-        mrc-ide/kelp
+        mrc-ide/kelp \
         mrc-ide/rrq
 
 RUN install2.r --error remotes &&  \
