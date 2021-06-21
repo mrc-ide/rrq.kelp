@@ -32,15 +32,14 @@ object_store_kelp <- R6::R6Class(
           length(hash), ngettext(length(hash), "hash", "hashes"),
           length(value), ngettext(length(value), "value", "values")))
       }
-      for (index in seq_along(hash)) {
-        object_hash <- hash[[index]]
-        kelp_id <- private$kelp$upload_raw(value[[index]],
-                                           collection = private$queue_id)
-        private$con$SET(rrq_kelp_hash_id(private$queue_id, object_hash),
-                        kelp_id)
-        private$con$SADD(private$hashes_set_id, object_hash)
 
-      }
+      kelp_ids <- lapply(value, function(data) {
+        private$kelp$upload_raw(data, collection = private$queue_id)
+      })
+      private$con$pipeline(
+        redux::redis$MSET(rrq_kelp_hash_id(private$queue_id, hash), kelp_ids),
+        redux::redis$SADD(private$hashes_set_id, hash)
+      )
       invisible(TRUE)
     },
 
@@ -49,10 +48,9 @@ object_store_kelp <- R6::R6Class(
     ##' @param hash A character vector of hashes of the objects to return.
     ##'   The objects will be deserialised before return.
     mget = function(hash) {
-      lapply(hash, function(object_hash) {
-        kelp_id <- private$con$GET(
-          rrq_kelp_hash_id(private$queue_id, object_hash))
-          private$kelp$download_object(kelp_id, collection = private$queue_id)
+      kelp_ids <- private$con$MGET(rrq_kelp_hash_id(private$queue_id, hash))
+      lapply(kelp_ids, function(kelp_id) {
+        private$kelp$download_object(kelp_id, collection = private$queue_id)
       })
     },
 
@@ -60,14 +58,13 @@ object_store_kelp <- R6::R6Class(
     ##'
     ##' @param hash A character vector of hashes to remove
     mdel = function(hash) {
-      lapply(hash, function(object_hash) {
-        kelp_id <- private$con$GET(
-          rrq_kelp_hash_id(private$queue_id, object_hash))
+      kelp_ids <- private$con$MGET(rrq_kelp_hash_id(private$queue_id, hash))
+      private$con$pipeline(
+        redux::redis$SREM(private$hashes_set_id, hash),
+        redux::redis$DEL(rrq_kelp_hash_id(private$queue_id, hash))
+      )
+      lapply(kelp_ids, function(kelp_id) {
         private$kelp$delete(kelp_id, collection = private$queue_id)
-        private$con$pipeline(
-          redux::redis$SREM(private$hashes_set_id, object_hash),
-          redux::redis$DEL(rrq_kelp_hash_id(private$queue_id, object_hash))
-        )
       })
     },
 
