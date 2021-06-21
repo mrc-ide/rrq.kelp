@@ -1,5 +1,5 @@
 Package: rrq.kelp
-Title: SeaweedFS backed file store for rrq
+Title: SeaweedFS Backed File Store for rrq
 Version: 0.1.0
 Authors@R: c(person("Rob", "Ashton", role = c("aut", "cre"),
                     email = "r.ashton@imperial.ac.uk"),
@@ -23,3 +23,6 @@ Imports:
     R6,
     redux,
     rrq
+Remotes:
+    mrc-ide/kelp
+    mrc-ide/rrq

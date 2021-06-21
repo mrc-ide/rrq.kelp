@@ -49,6 +49,8 @@ jobs:
           install.packages(c("remotes"))
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("covr")
+          remotes::install_github("mrc-ide/kelp")
+          remotes::install_github("mrc-ide/rrq")
         shell: Rscript {0}
 
       - name: Start SeaweedFS

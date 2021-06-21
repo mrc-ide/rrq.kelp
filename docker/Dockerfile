@@ -16,6 +16,7 @@ COPY docker/bin /usr/local/bin/
 
 RUN install_remote \
         mrc-ide/kelp
+        mrc-ide/rrq
 
 RUN install2.r --error remotes &&  \
         Rscript -e 'remotes::install_deps("/tmp")'
