@@ -34,8 +34,8 @@ object_store_kelp <- R6::R6Class(
       }
       for (index in seq_along(hash)) {
         object_hash <- hash[[index]]
-        kelp_id <- private$kelp$upload_object(value[[index]],
-                                              collection = private$queue_id)
+        kelp_id <- private$kelp$upload_raw(value[[index]],
+                                           collection = private$queue_id)
         private$con$SET(rrq_kelp_hash_id(private$queue_id, object_hash),
                         kelp_id)
         private$con$SADD(private$hashes_set_id, object_hash)
@@ -52,8 +52,7 @@ object_store_kelp <- R6::R6Class(
       lapply(hash, function(object_hash) {
         kelp_id <- private$con$GET(
           rrq_kelp_hash_id(private$queue_id, object_hash))
-        redux::bin_to_object(
-          private$kelp$download_object(kelp_id, collection = private$queue_id))
+          private$kelp$download_object(kelp_id, collection = private$queue_id)
       })
     },
 

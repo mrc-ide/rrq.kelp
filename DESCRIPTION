@@ -19,7 +19,7 @@ Suggests:
     testthat,
     withr
 Imports:
-    kelp,
+    kelp (>= 0.1.2),
     R6,
     redux,
     rrq
