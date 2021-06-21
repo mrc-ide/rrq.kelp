@@ -5,7 +5,7 @@ Authors@R: c(person("Rob", "Ashton", role = c("aut", "cre"),
                     email = "r.ashton@imperial.ac.uk"),
              person("Imperial College of Science, Technology and Medicine",
                     role = "cph"))
-Description: A offload file store for rrq. Using kelp API to interact with
+Description: An offload file store for rrq. Using kelp API to interact with
     SeaweedFS, this can be used to save large input or output data to a 
     distributed file store.
 License: MIT + file LICENSE
@@ -26,3 +26,4 @@ Imports:
 Remotes:
     mrc-ide/kelp,
     mrc-ide/rrq
+Config/testthat/edition: 3
