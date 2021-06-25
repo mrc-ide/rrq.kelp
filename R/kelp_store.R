@@ -77,13 +77,12 @@ object_store_kelp <- R6::R6Class(
     ##' collection from SeaweedFS and removing all data from redis.
     destroy = function() {
       private$kelp$delete_collection(private$queue_id)
-      private$con$pipeline(.commands = c(
-        lapply(self$list(), function(x) {
-          redux::redis$DEL(rrq_kelp_hash_id(private$queue_id, x))
-        }),
-      list(
-        redux::redis$DEL(private$hashes_set_id)
-      )))
+      del_hash_kelp_id_maps <- lapply(self$list(), function(x) {
+        redux::redis$DEL(rrq_kelp_hash_id(private$queue_id, x))
+      })
+      del_hash_set <- list(redux::redis$DEL(private$hashes_set_id))
+      private$con$pipeline(.commands = c(del_hash_kelp_id_maps,
+                                         del_hash_set))
     }
   ),
 
