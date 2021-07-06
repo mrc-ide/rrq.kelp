@@ -74,9 +74,6 @@ jobs:
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: Test coverage
         run: covr::codecov()
         shell: Rscript {0}
