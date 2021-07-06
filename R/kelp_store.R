@@ -2,6 +2,7 @@
 ##' intended at all for direct user-use.
 ##'
 ##' @title SeaweedFS-based rrq offload
+##' @export
 object_store_kelp <- R6::R6Class(
   "object_store_kelp",
   cloneable = FALSE,
@@ -49,9 +50,8 @@ object_store_kelp <- R6::R6Class(
     ##'   The objects will be deserialised before return.
     mget = function(hash) {
       kelp_ids <- private$con$MGET(rrq_kelp_hash_id(private$queue_id, hash))
-      lapply(kelp_ids, function(kelp_id) {
-        private$kelp$download_object(kelp_id, collection = private$queue_id)
-      })
+      lapply(kelp_ids, private$kelp$download_object,
+             collection = private$queue_id)
     },
 
     ##' @description Delete a number of objects from SeaweedFS
@@ -63,9 +63,7 @@ object_store_kelp <- R6::R6Class(
         redux::redis$SREM(private$hashes_set_id, hash),
         redux::redis$DEL(rrq_kelp_hash_id(private$queue_id, hash))
       )
-      lapply(kelp_ids, function(kelp_id) {
-        private$kelp$delete(kelp_id, collection = private$queue_id)
-      })
+      lapply(kelp_ids, private$kelp$delete, collection = private$queue_id)
     },
 
     ##' @description List hashes stored in this offload store
