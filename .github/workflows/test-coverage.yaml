@@ -12,7 +12,7 @@ name: test-coverage
 
 jobs:
   test-coverage:
-    runs-on: macOS-latest
+    runs-on: ubuntu-20.04
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -36,12 +36,43 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        run: |
+
+          while read -r cmd
+          do
+            eval sudo $cmd
+          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
+          sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+
       - name: Install dependencies
         run: |
-          install.packages(c("remotes"))
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("covr")
         shell: Rscript {0}
+
+      - name: Start SeaweedFS
+        if: runner.os == 'Linux'
+        run: ./scripts/seaweed start
+
+      - name: Start Redis
+        if: runner.os != 'Windows'
+        uses: shogo82148/actions-setup-redis@v1
+        with:
+          redis-version: "4.x"
+
+      - name: Create free space
+        if: runner.os == 'Linux'
+        run: |
+          # Workaround to provide additional free space for testing.
+          # We need this because otherwise SeaweedFS runs out of space
+          # and builds run until they time out
+          # https://github.com/actions/virtual-environments/issues/2840
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - name: Test coverage
         run: covr::codecov()

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -e
+CONTAINER_MASTER=seaweed_master
+CONTAINER_VOLUME=seaweed_volume
+NETWORK=seaweed_network
+if [ "$1" = "start" ]; then
+    docker network create $NETWORK
+    docker run -d --rm -p 9333:9333 \
+      --network $NETWORK \
+      --name $CONTAINER_MASTER \
+      chrislusf/seaweedfs master -ip=$CONTAINER_MASTER
+    docker run -d --rm -p 8080:8080 -p 18080:18080 \
+      --network $NETWORK \
+      --name $CONTAINER_VOLUME \
+      chrislusf/seaweedfs volume \
+      -max=50 -mserver=$CONTAINER_MASTER:9333 -port=8080
+    sleep 5
+elif [ "$1" = "stop" ]; then
+    docker stop $CONTAINER_MASTER || true
+    docker stop $CONTAINER_VOLUME || true
+    docker network rm $NETWORK || true
+elif [ "$1" = "restart" ]; then
+    docker stop $CONTAINER_MASTER || true
+    docker stop $CONTAINER_VOLUME || true
+    docker network create $NETWORK || true
+    docker run -d --rm -p 9333:9333 \
+      --network $NETWORK \
+      --name $CONTAINER_MASTER \
+      chrislusf/seaweedfs master -ip=$CONTAINER_MASTER
+    docker run -d --rm -p 8080:8080 -p 18080:18080 \
+      --network $NETWORK \
+      --name $CONTAINER_VOLUME \
+      chrislusf/seaweedfs volume \
+      -max=50 -mserver=$CONTAINER_MASTER:9333 -port=8080
+    sleep 5
+else
+    echo "Usage: seaweed <start|stop|restart>"
+    exit 1
+fi
